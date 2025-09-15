@@ -1,0 +1,132 @@
+# SnailyCAD Admin Tools
+
+Simple tools to fix common SnailyCAD problems.
+
+**SnailyCAD** is a police/EMS dispatch system used by FiveM, GTA roleplay servers, and other gaming communities.
+
+## Common Problems These Fix
+
+### User Problems
+- User forgot their password → Reset it for them
+- User can't login because Discord is broken → Unlink their Discord
+- User changed Discord accounts → Unlink old Discord, let them link new one
+- Need to see all users → List everyone registered
+
+### Login Problems 
+- Want to force everyone to use Discord only → Disable regular passwords
+- Discord login is broken, need regular login → Enable password login
+- Want to add Steam login → Enable Steam authentication
+- Need to turn off whitelist → Disable CAD whitelist for everyone
+
+### Server Maintenance
+- Database is slow → Clean up and optimize database
+- Want to see who's connected → Show active users
+- Check if database is healthy → Run health checks
+
+## How to Use
+
+### Windows Users
+1. Download `cad_admin.bat`
+2. Double-click it
+3. Enter your database info when asked
+4. Pick what you want to fix
+
+### Mac/Linux Users
+1. Download `full-snailycad-recovery.sh`  
+2.wget https://raw.githubusercontent.com/EWANZO101/newdocs/main/caddownloads/full-snailycad-recovery.sh -O full-snailycad-recovery.sh
+
+3. Open Terminal and run:
+```bash
+chmod +x full-snailycad-recovery.sh
+./full-snailycad-recovery.sh
+```
+3. Enter your database info when asked
+4. Pick what you want to fix
+
+## What Each Option Does
+
+**Option 1: Show All Users**
+Shows you everyone who has an account. Displays username, user ID, and if they have Discord linked.
+
+**Option 2: Unlink Discord Account**
+Removes Discord connection from a user. Use when user changed Discord accounts or Discord login is broken. Enter their Discord ID (the long number).
+
+**Option 3: Turn Off Whitelist**
+Lets anyone join your CAD (removes whitelist). Warning: This affects your ENTIRE server.
+
+**Option 4: Change Login Methods**
+- **ALLOW_REGULAR_LOGIN** - Turn ON: Users can login with username/password. Turn OFF: Users MUST use Discord or Steam.
+- **STEAM_OAUTH** - Turn ON: Users can login with Steam account. Turn OFF: No Steam login allowed.
+- **DISCORD_AUTH** - Turn ON: Users can login with Discord. Turn OFF: No Discord login.
+
+Common scenarios:
+- Force Discord only: Turn OFF regular login, Turn ON Discord
+- Emergency access: Turn ON regular login if Discord is broken
+- Add Steam: Turn ON Steam OAuth
+
+**Option 5: Reset Someone's Password**
+Changes a user's password for them. Shows list of all users with numbers, enter the number of the user, enter new password.
+
+**Option 6: Server Maintenance**
+Cleans up and optimizes your database:
+- **Vacuum:** Cleans up deleted data (makes database faster)
+- **Update Stats:** Helps database run queries faster
+- **Check Health:** Shows if anything is broken
+- **Show Size:** See how much space database uses
+- **Show Connections:** See who's currently using the server
+
+## Emergency Fixes
+
+**"Everyone is locked out!"**
+1. Run the tool
+2. Choose Option 4 (Change Login Methods)
+3. Turn ON "ALLOW_REGULAR_LOGIN"
+
+**"Discord integration is broken!"**
+1. Run the tool
+2. Choose Option 2 (Unlink Discord)
+3. Enter each user's Discord ID to unlink them
+
+**"User forgot password and Discord is broken"**
+1. Option 2 to unlink their Discord
+2. Option 5 to reset their password
+3. Give them the new password
+
+**"Need to let everyone in right now"**
+1. Run the tool
+2. Choose Option 3 (Turn Off Whitelist)
+3. Confirm
+
+## What You Need
+
+Your SnailyCAD database info - you can find all this in your SnailyCAD `.env` file:
+- Database name (`DATABASE_URL` or `POSTGRES_DB`)
+- Username (`DATABASE_URL` or `POSTGRES_USER`)
+- Password (`DATABASE_URL` or `POSTGRES_PASSWORD`)
+- Server address (`DATABASE_URL` or `POSTGRES_HOST`)
+- Port (`DATABASE_URL` or `POSTGRES_PORT`)
+
+Example from your `.env` file:
+```
+
+```
+This means: username=`postgres`, password=`yourpassword`, host=`localhost`, port=`5432`, database=`snaily-cad`
+
+## Troubleshooting
+
+
+**"Connection refused"**
+- Check if PostgreSQL is running
+- Check username/password is correct
+- Try `localhost` as server address
+
+**"Permission denied"**
+- Use the `postgres` superuser account
+- Or ask someone with database admin rights to run it
+
+## Important Notes
+
+- Always backup your database first
+- Test changes with one user before doing bulk operations
+- These tools directly modify your database
+- Don't share your database password with anyone
