@@ -171,3 +171,406 @@ database = snaily-cad
     These tools edit your database directly
 
     Never share your database password
+
+-------------------------
+
+
+
+
+---
+title: "SnailyCAD Admin Commands - Manual Documentation"
+description: "Complete manual database administration commands for SnailyCAD"
+---
+
+# SnailyCAD Admin Commands - Manual Documentation
+
+This documentation provides all the manual commands from the SnailyCAD administration scripts. You can execute these commands directly using PostgreSQL command line tools or any database client.
+
+> **Warning**: Always backup your database before running these commands. Some operations are irreversible.
+
+## Database Connection Setup
+
+### Unix/Linux/macOS
+
+```bash
+# Set environment variable for password
+export PGPASSWORD="your_password"
+
+# Connect to database
+psql -U your_username -d your_database -h localhost -p 5432
+```
+
+### Windows
+
+```cmd
+# Navigate to PostgreSQL bin directory
+cd "C:\Program Files\PostgreSQL\15\bin"
+
+# Set password for this session
+set PGPASSWORD=your_password
+
+# Connect to PostgreSQL database
+psql -U your_username ^
+     -d your_database ^
+     -h localhost ^
+     -p 5432
+```
+
+## User Management Commands
+
+### 1. List All Users
+
+Display all users with their ID, username, and Discord ID.
+
+```sql
+SELECT row_number() OVER () AS num, id, username, "discordId" 
+FROM public."User" 
+ORDER BY username;
+```
+
+### 2. Search User by Discord ID
+
+Find users associated with a specific Discord ID.
+
+```sql
+SELECT id, username, "discordId" 
+FROM public."User" 
+WHERE "discordId" = 'REPLACE_WITH_DISCORD_ID';
+```
+
+### 3. Unlink Discord ID
+
+Remove Discord ID association from a user account.
+
+```sql
+UPDATE public."User" 
+SET "discordId" = NULL 
+WHERE "discordId" = 'REPLACE_WITH_DISCORD_ID';
+```
+
+### 4. List Users without Discord ID
+
+Show users who don't have a Discord ID linked (first 10).
+
+```sql
+SELECT id, username 
+FROM public."User" 
+WHERE "discordId" IS NULL AND username IS NOT NULL 
+LIMIT 10;
+```
+
+## Password Management
+
+### 1. Enable pgcrypto Extension
+
+Required for password encryption. Run this first.
+
+```sql
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+```
+
+### 2. Reset Password by Username
+
+Reset a user's password using their username.
+
+```sql
+UPDATE public."User" 
+SET password = crypt('NEW_PASSWORD_HERE', gen_salt('bf')) 
+WHERE username = 'USERNAME_HERE';
+```
+
+### 3. Reset Password by Row Number
+
+Reset password using the row number from the user list.
+
+```sql
+UPDATE public."User" 
+SET password = crypt('NEW_PASSWORD_HERE', gen_salt('bf')) 
+WHERE username = (
+    SELECT username FROM (
+        SELECT row_number() OVER () AS num, username 
+        FROM public."User" 
+        WHERE username IS NOT NULL 
+        ORDER BY username
+    ) t WHERE num = ROW_NUMBER_HERE
+);
+```
+
+## CAD Management
+
+### 1. View CAD Whitelist Status
+
+Check current whitelist status for all CADs.
+
+```sql
+SELECT id, name, whitelisted 
+FROM public."cad";
+```
+
+### 2. Disable All CAD Whitelists
+
+Disable whitelist for ALL CADs (allows open registration).
+
+```sql
+UPDATE public."cad" 
+SET whitelisted = false;
+```
+
+### 3. Enable Specific CAD Whitelist
+
+Enable whitelist for a specific CAD by name.
+
+```sql
+UPDATE public."cad" 
+SET whitelisted = true 
+WHERE name = 'CAD_NAME_HERE';
+```
+
+## Feature Management
+
+### 1. View Current Feature Status
+
+Check the status of all CAD features.
+
+```sql
+SELECT feature, "isEnabled" 
+FROM public."CadFeature" 
+ORDER BY feature;
+```
+
+### 2. Enable Regular Login (Username/Password)
+
+Allow users to login with username and password.
+
+```sql
+UPDATE public."CadFeature" 
+SET "isEnabled" = true 
+WHERE feature = 'ALLOW_REGULAR_LOGIN';
+```
+
+### 3. Disable Discord Authentication
+
+Disable forced Discord authentication.
+
+```sql
+UPDATE public."CadFeature" 
+SET "isEnabled" = false 
+WHERE feature = 'DISCORD_AUTH';
+```
+
+### 4. Enable Steam OAuth
+
+Enable Steam login authentication.
+
+```sql
+UPDATE public."CadFeature" 
+SET "isEnabled" = true 
+WHERE feature = 'STEAM_OAUTH';
+```
+
+### 5. Check Specific Feature Status
+
+Check the status of a specific feature.
+
+```sql
+SELECT "isEnabled" 
+FROM public."CadFeature" 
+WHERE feature = 'FEATURE_NAME_HERE';
+```
+
+## Database Maintenance
+
+### 1. Vacuum Database
+
+Clean up dead rows and update statistics.
+
+```sql
+VACUUM ANALYZE;
+```
+
+### 2. Update Database Statistics
+
+Update query planner statistics.
+
+```sql
+ANALYZE;
+```
+
+### 3. Check Database Integrity
+
+Check database statistics and integrity.
+
+```sql
+SELECT schemaname, tablename, attname, n_distinct, correlation 
+FROM pg_stats 
+WHERE schemaname = 'public' 
+LIMIT 10;
+```
+
+### 4. Check Database Size
+
+Display the current database size.
+
+```sql
+SELECT pg_size_pretty(pg_database_size(current_database())) as database_size;
+```
+
+### 5. Show Active Connections
+
+Display currently active database connections.
+
+```sql
+SELECT pid, usename, application_name, client_addr, state, query_start 
+FROM pg_stat_activity 
+WHERE state = 'active';
+```
+
+## Common Recovery Scenarios
+
+### Scenario 1: Enable Username/Password Login
+
+When Discord authentication is broken and you need to enable regular login.
+
+Steps:
+1. Enable regular login feature
+2. Disable Discord authentication
+3. Reset user password if needed
+
+```sql
+-- Enable regular login
+UPDATE public."CadFeature" SET "isEnabled" = true WHERE feature = 'ALLOW_REGULAR_LOGIN';
+
+-- Disable Discord authentication
+UPDATE public."CadFeature" SET "isEnabled" = false WHERE feature = 'DISCORD_AUTH';
+
+-- Optional: Reset password for admin user
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+UPDATE public."User" SET password = crypt('newpassword', gen_salt('bf')) WHERE username = 'admin';
+```
+
+### Scenario 2: Open Registration (Remove Whitelist)
+
+When you need to allow new users to register freely.
+
+```sql
+-- Disable CAD whitelist (allow open registration)
+UPDATE public."cad" SET whitelisted = false;
+
+-- Verify the change
+SELECT id, name, whitelisted FROM public."cad";
+```
+
+### Scenario 3: Fix Discord Integration Issues
+
+When Discord accounts are causing login problems.
+
+```sql
+-- Find users with Discord issues
+SELECT id, username, "discordId" FROM public."User" WHERE "discordId" IS NOT NULL;
+
+-- Unlink specific Discord ID
+UPDATE public."User" SET "discordId" = NULL WHERE "discordId" = 'PROBLEMATIC_DISCORD_ID';
+
+-- Enable regular login as backup
+UPDATE public."CadFeature" SET "isEnabled" = true WHERE feature = 'ALLOW_REGULAR_LOGIN';
+```
+
+## Complete Original Scripts
+
+If you prefer to use the full interactive scripts instead of individual commands:
+
+### Unix/Linux/macOS Script
+
+```bash
+# Make the script executable
+chmod +x full-snailycad-recovery.sh
+
+# Run the script
+./full-snailycad-recovery.sh
+```
+
+### Windows Script
+
+```cmd
+REM Run the script
+recover.bat
+```
+
+## Additional Commands Reference
+
+### Find Users by Username Pattern
+
+```sql
+SELECT id, username, "discordId" 
+FROM public."User" 
+WHERE username LIKE '%PATTERN%';
+```
+
+### Count Total Users
+
+```sql
+SELECT COUNT(*) as total_users 
+FROM public."User" 
+WHERE username IS NOT NULL;
+```
+
+### List All Features and Their Status
+
+```sql
+SELECT feature, "isEnabled",
+  CASE 
+    WHEN "isEnabled" = true THEN 'Enabled' 
+    ELSE 'Disabled' 
+  END as status
+FROM public."CadFeature" 
+ORDER BY feature;
+```
+
+### Backup Important Tables (pg_dump commands)
+
+```bash
+# Backup User table
+pg_dump -U your_username -h localhost -p 5432 -d your_database -t public."User" > user_backup.sql
+
+# Backup CadFeature table
+pg_dump -U your_username -h localhost -p 5432 -d your_database -t public."CadFeature" > features_backup.sql
+
+# Backup CAD table
+pg_dump -U your_username -h localhost -p 5432 -d your_database -t public."cad" > cad_backup.sql
+```
+
+### Test Database Connection
+
+```sql
+SELECT current_database(), current_user, version();
+```
+
+---
+
+**Remember**: Always backup your database before running these commands. Test commands on a development environment first when possible.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
