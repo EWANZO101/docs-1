@@ -1,576 +1,257 @@
-# SnailyCAD Admin Tools
+# SnailyCAD Admin Tools - Complete Guide
 
-Easy tools to fix common SnailyCAD problems.  
-
-**SnailyCAD** is a police/EMS dispatch system used in FiveM, GTA roleplay servers, and other gaming communities.
+**SnailyCAD** is a police/EMS dispatch system used in FiveM, GTA roleplay servers, and other gaming communities. This guide provides comprehensive administrative tools to resolve common issues and maintain your SnailyCAD installation.
 
 ---
 
-## 🚨 Problems This Fixes
+## 🚀 Quick Start
 
-### 👤 User Problems
-- Forgot password → Reset it  
-- Can’t log in because Discord broke → Unlink their Discord  
-- Switched Discord accounts → Remove old Discord, link new one  
-- See all users → List all registered users  
+### Installation
 
-### 🔑 Login Problems
-- Force Discord only → Turn off regular passwords  
-- Discord login broken → Turn on password login  
-- Want Steam login → Turn on Steam authentication  
-- Disable whitelist → Let everyone join  
-
-### 🛠️ Server Maintenance
-- Database is slow → Clean and optimize it  
-- See who’s online → Show active users  
-- Check database health → Run health checks  
-
----
-
-## 📖 How to Use
-
-If you want to run step by step, follow the doc at the broom of this page
-
+**Windows:**
+```cmd
 git clone https://github.com/EWANZO101/sh.git
 cd sh
 recover.bat
+```
 
-
-
-2. Double-click it  
-3. Enter your database info  
-4. Pick what you want to fix  
-
+**Linux/macOS:**
+```bash
 git clone https://github.com/EWANZO101/sh.git
 cd sh
 chmod +x full-snailycad-recovery.sh
 ./full-snailycad-recovery.sh
+```
 
-
-    Enter your database info
-
-    Pick what you want to fix
-
-⚙️ Options
-1. Show All Users
-
-See all accounts (username, ID, Discord linked or not).
-2. Unlink Discord Account
-
-Remove Discord from a user. Use if login breaks or they changed Discord accounts.
-3. Turn Off Whitelist
-
-Lets anyone join.
-⚠️ This affects the entire server.
-4. Change Login Methods
-
-    ALLOW_REGULAR_LOGIN → ON = password login works. OFF = must use Discord/Steam.
-
-    STEAM_OAUTH → ON = Steam login allowed. OFF = no Steam login.
-
-    DISCORD_AUTH → ON = Discord login works. OFF = no Discord login.
-
-Common setups:
-
-    Force Discord only → OFF regular login, ON Discord
-
-    Emergency login → ON regular login
-
-    Add Steam → ON Steam OAuth
-
-5. Reset Password
-
-Pick a user from the list and set a new password.
-6. Server Maintenance
-
-    Vacuum = cleanup deleted data
-
-    Update Stats = speed up queries
-
-    Check Health = see if database is broken
-
-    Show Size = check database size
-
-    Show Connections = see who’s online
-
-🆘 Emergency Fixes
-Everyone locked out
-
-    Run tool
-
-    Option 4 → Turn ON regular login
-
-Discord broken
-
-    Run tool
-
-    Option 2 → Unlink Discord
-
-    Enter Discord IDs
-
-User can’t log in (forgot password + Discord broken)
-
-    Option 2 → Unlink Discord
-
-    Option 5 → Reset password
-
-    Give new password
-
-Need to let everyone in now
-
-    Run tool
-
-    Option 3 → Turn off whitelist
-
-    Confirm
-
-🔑 What You Need
-
-Find database info in your .env file:
-
-    Database name → DATABASE_URL or POSTGRES_DB
-
-    Username → DATABASE_URL or POSTGRES_USER
-
-    Password → DATABASE_URL or POSTGRES_PASSWORD
-
-    Host/server → DATABASE_URL or POSTGRES_HOST
-
-    Port → DATABASE_URL or POSTGRES_PORT
-
-Example:
-
-username = postgres
-password = yourpassword
-host = localhost
-port = 5432
-database = snaily-cad
-
-🐞 Troubleshooting
-❌ Connection refused
-
-    Check PostgreSQL is running
-
-    Check username/password
-
-    Try localhost as server
-
-🔒 Permission denied
-
-    Use postgres superuser
-
-    Or ask a database admin
-
-📌 Notes
-
-    Always back up your database first
-
-    Test with one user before big changes
-
-    These tools edit your database directly
-
-    Never share your database password
-
--------------------------
-
-
-
+### Usage
+1. Run the appropriate script for your operating system
+2. Enter your database connection information
+3. Select the operation you need from the menu
 
 ---
-title: "SnailyCAD Admin Commands - Manual Documentation"
-description: "Complete manual database administration commands for SnailyCAD"
+
+## 🛠️ Core Features
+
+### User Management
+- **View All Users** - Display complete user roster with Discord linking status
+- **Unlink Discord Accounts** - Remove Discord associations for broken logins
+- **Password Reset** - Set new passwords for any user account
+- **User Search** - Find users by Discord ID or username
+
+### Authentication Control
+- **Login Method Toggle** - Switch between Discord, Steam, and password authentication
+- **Whitelist Management** - Control server access permissions
+- **Emergency Access** - Restore access when authentication systems fail
+
+### Database Maintenance
+- **Health Checks** - Verify database integrity and performance
+- **Optimization** - Clean up and optimize database performance
+- **Connection Monitoring** - View active database connections
+- **Size Analytics** - Monitor database storage usage
+
 ---
 
-# SnailyCAD Admin Commands - Manual Documentation
+## 🔧 Available Operations
 
-This documentation provides all the manual commands from the SnailyCAD administration scripts. You can execute these commands directly using PostgreSQL command line tools or any database client.
-**Remember**: Always backup your database before running these commands. Test commands on a development environment first when possible.
-**Remember**: Always backup your database before running these commands. Test commands on a development environment first when possible.
+### 1. Show All Users
+Lists all registered accounts with username, ID, and Discord link status.
 
-> **Warning**: Always backup your database before running these commands. Some operations are irreversible.
+### 2. Unlink Discord Account
+Removes Discord association from user accounts. Essential when:
+- User changes Discord accounts
+- Discord authentication breaks
+- Login issues with Discord integration
 
-## Database Connection Setup
+### 3. Whitelist Management
+**Disable Whitelist:** Allows open registration to the server  
+⚠️ **Note:** This affects the entire server configuration
 
-### Unix/Linux/macOS
+### 4. Authentication Methods
 
+Configure login options for your server:
+
+| Setting | Description | Use Case |
+|---------|-------------|----------|
+| `ALLOW_REGULAR_LOGIN` | Username/password login | Emergency access, Discord issues |
+| `STEAM_OAUTH` | Steam account authentication | Gaming community integration |
+| `DISCORD_AUTH` | Discord account authentication | Community server standard |
+
+**Common Configurations:**
+- **Discord Only:** Disable regular login, enable Discord auth
+- **Emergency Mode:** Enable regular login (when Discord fails)
+- **Multi-Platform:** Enable Steam OAuth for additional options
+
+### 5. Password Reset
+Select any user from the system and assign a new password for immediate access.
+
+### 6. Database Maintenance
+
+| Operation | Purpose | Frequency |
+|-----------|---------|-----------|
+| **Vacuum** | Clean deleted data and optimize storage | Weekly |
+| **Update Stats** | Improve query performance | After major changes |
+| **Health Check** | Verify database integrity | Monthly |
+| **Size Check** | Monitor storage usage | As needed |
+| **Active Connections** | View current user sessions | Troubleshooting |
+
+---
+
+## 🆘 Emergency Scenarios
+
+### Complete Lockout (Everyone Unable to Access)
+```
+1. Run admin tool
+2. Select "Authentication Methods"
+3. Enable "ALLOW_REGULAR_LOGIN"
+4. Users can now log in with username/password
+```
+
+### Discord Integration Failure
+```
+1. Run admin tool
+2. Select "Unlink Discord Account"
+3. Enter affected Discord IDs
+4. Enable regular login as backup
+5. Users can access with username/password
+```
+
+### Forgotten Password + Discord Issues
+```
+1. Run admin tool
+2. Select "Unlink Discord Account" (remove Discord)
+3. Select "Password Reset" (set new password)
+4. Provide new credentials to user
+```
+
+### Server Access Restriction
+```
+1. Run admin tool
+2. Select "Whitelist Management"
+3. Choose "Disable Whitelist"
+4. Confirm action
+5. Server now allows open registration
+```
+
+---
+
+## 📋 Database Connection Requirements
+
+Locate your database credentials in the `.env` file:
+
+| Parameter | Environment Variable | Example |
+|-----------|---------------------|---------|
+| **Database Name** | `DATABASE_URL` or `POSTGRES_DB` | `snaily-cad` |
+| **Username** | `DATABASE_URL` or `POSTGRES_USER` | `postgres` |
+| **Password** | `DATABASE_URL` or `POSTGRES_PASSWORD` | `yourpassword` |
+| **Host** | `DATABASE_URL` or `POSTGRES_HOST` | `localhost` |
+| **Port** | `DATABASE_URL` or `POSTGRES_PORT` | `5432` |
+
+**Example Configuration:**
+```
+Database: snaily-cad
+Username: postgres
+Password: yourpassword
+Host: localhost
+Port: 5432
+```
+
+---
+
+## 🔍 Manual Database Commands
+
+For advanced users who prefer direct database access:
+
+### Connection Setup
+
+**Linux/macOS:**
 ```bash
-# Set environment variable for password
 export PGPASSWORD="your_password"
-
-# Connect to database
 psql -U your_username -d your_database -h localhost -p 5432
 ```
 
-### Windows
-
+**Windows:**
 ```cmd
-# Navigate to PostgreSQL bin directory
-cd "C:\Program Files\PostgreSQL\15\bin"
-
-# Set password for this session
 set PGPASSWORD=your_password
-
-# Connect to PostgreSQL database
-psql -U your_username ^
-     -d your_database ^
-     -h localhost ^
-     -p 5432
+psql -U your_username -d your_database -h localhost -p 5432
 ```
 
-## User Management Commands
+### Essential Commands
 
-### 1. List All Users
-
-Display all users with their ID, username, and Discord ID.
-
+**List All Users:**
 ```sql
 SELECT row_number() OVER () AS num, id, username, "discordId" 
 FROM public."User" 
 ORDER BY username;
 ```
 
-### 2. Search User by Discord ID
-
-Find users associated with a specific Discord ID.
-
-```sql
-SELECT id, username, "discordId" 
-FROM public."User" 
-WHERE "discordId" = 'REPLACE_WITH_DISCORD_ID';
-```
-
-### 3. Unlink Discord ID
-
-Remove Discord ID association from a user account.
-
+**Unlink Discord ID:**
 ```sql
 UPDATE public."User" 
 SET "discordId" = NULL 
-WHERE "discordId" = 'REPLACE_WITH_DISCORD_ID';
+WHERE "discordId" = 'DISCORD_ID_HERE';
 ```
 
-### 4. List Users without Discord ID
-
-Show users who don't have a Discord ID linked (first 10).
-
-```sql
-SELECT id, username 
-FROM public."User" 
-WHERE "discordId" IS NULL AND username IS NOT NULL 
-LIMIT 10;
-```
-
-## Password Management
-
-### 1. Enable pgcrypto Extension
-
-Required for password encryption. Run this first.
-
+**Reset Password:**
 ```sql
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
-```
-
-### 2. Reset Password by Username
-
-Reset a user's password using their username.
-
-```sql
 UPDATE public."User" 
-SET password = crypt('NEW_PASSWORD_HERE', gen_salt('bf')) 
+SET password = crypt('NEW_PASSWORD', gen_salt('bf')) 
 WHERE username = 'USERNAME_HERE';
 ```
 
-### 3. Reset Password by Row Number
-
-Reset password using the row number from the user list.
-
+**Disable Whitelist:**
 ```sql
-UPDATE public."User" 
-SET password = crypt('NEW_PASSWORD_HERE', gen_salt('bf')) 
-WHERE username = (
-    SELECT username FROM (
-        SELECT row_number() OVER () AS num, username 
-        FROM public."User" 
-        WHERE username IS NOT NULL 
-        ORDER BY username
-    ) t WHERE num = ROW_NUMBER_HERE
-);
+UPDATE public."cad" SET whitelisted = false;
 ```
 
-## CAD Management
-
-### 1. View CAD Whitelist Status
-
-Check current whitelist status for all CADs.
-
-```sql
-SELECT id, name, whitelisted 
-FROM public."cad";
-```
-
-### 2. Disable All CAD Whitelists
-
-Disable whitelist for ALL CADs (allows open registration).
-
-```sql
-UPDATE public."cad" 
-SET whitelisted = false;
-```
-
-### 3. Enable Specific CAD Whitelist
-
-Enable whitelist for a specific CAD by name.
-
-```sql
-UPDATE public."cad" 
-SET whitelisted = true 
-WHERE name = 'CAD_NAME_HERE';
-```
-
-## Feature Management
-
-### 1. View Current Feature Status
-
-Check the status of all CAD features.
-
-```sql
-SELECT feature, "isEnabled" 
-FROM public."CadFeature" 
-ORDER BY feature;
-```
-
-### 2. Enable Regular Login (Username/Password)
-
-Allow users to login with username and password.
-
+**Enable Regular Login:**
 ```sql
 UPDATE public."CadFeature" 
 SET "isEnabled" = true 
 WHERE feature = 'ALLOW_REGULAR_LOGIN';
 ```
 
-### 3. Disable Discord Authentication
-
-Disable forced Discord authentication.
-
-```sql
-UPDATE public."CadFeature" 
-SET "isEnabled" = false 
-WHERE feature = 'DISCORD_AUTH';
-```
-
-### 4. Enable Steam OAuth
-
-Enable Steam login authentication.
-
-```sql
-UPDATE public."CadFeature" 
-SET "isEnabled" = true 
-WHERE feature = 'STEAM_OAUTH';
-```
-
-### 5. Check Specific Feature Status
-
-Check the status of a specific feature.
-
-```sql
-SELECT "isEnabled" 
-FROM public."CadFeature" 
-WHERE feature = 'FEATURE_NAME_HERE';
-```
-
-## Database Maintenance
-
-### 1. Vacuum Database
-
-Clean up dead rows and update statistics.
-
+**Database Maintenance:**
 ```sql
 VACUUM ANALYZE;
 ```
 
-### 2. Update Database Statistics
+---
 
-Update query planner statistics.
+## ⚠️ Troubleshooting
 
-```sql
-ANALYZE;
-```
+### Connection Issues
 
-### 3. Check Database Integrity
+**Error: Connection Refused**
+- Verify PostgreSQL service is running
+- Check username and password
+- Try `localhost` as the host address
+- Confirm port number (default: 5432)
 
-Check database statistics and integrity.
+**Error: Permission Denied**
+- Use PostgreSQL superuser account (`postgres`)
+- Contact database administrator for permissions
+- Verify user has necessary database privileges
 
-```sql
-SELECT schemaname, tablename, attname, n_distinct, correlation 
-FROM pg_stats 
-WHERE schemaname = 'public' 
-LIMIT 10;
-```
+### Best Practices
 
-### 4. Check Database Size
-
-Display the current database size.
-
-```sql
-SELECT pg_size_pretty(pg_database_size(current_database())) as database_size;
-```
-
-### 5. Show Active Connections
-
-Display currently active database connections.
-
-```sql
-SELECT pid, usename, application_name, client_addr, state, query_start 
-FROM pg_stat_activity 
-WHERE state = 'active';
-```
-
-## Common Recovery Scenarios
-
-### Scenario 1: Enable Username/Password Login
-
-When Discord authentication is broken and you need to enable regular login.
-
-Steps:
-1. Enable regular login feature
-2. Disable Discord authentication
-3. Reset user password if needed
-
-```sql
--- Enable regular login
-UPDATE public."CadFeature" SET "isEnabled" = true WHERE feature = 'ALLOW_REGULAR_LOGIN';
-
--- Disable Discord authentication
-UPDATE public."CadFeature" SET "isEnabled" = false WHERE feature = 'DISCORD_AUTH';
-
--- Optional: Reset password for admin user
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-UPDATE public."User" SET password = crypt('newpassword', gen_salt('bf')) WHERE username = 'admin';
-```
-
-### Scenario 2: Open Registration (Remove Whitelist)
-
-When you need to allow new users to register freely.
-
-```sql
--- Disable CAD whitelist (allow open registration)
-UPDATE public."cad" SET whitelisted = false;
-
--- Verify the change
-SELECT id, name, whitelisted FROM public."cad";
-```
-
-### Scenario 3: Fix Discord Integration Issues
-
-When Discord accounts are causing login problems.
-
-```sql
--- Find users with Discord issues
-SELECT id, username, "discordId" FROM public."User" WHERE "discordId" IS NOT NULL;
-
--- Unlink specific Discord ID
-UPDATE public."User" SET "discordId" = NULL WHERE "discordId" = 'PROBLEMATIC_DISCORD_ID';
-
--- Enable regular login as backup
-UPDATE public."CadFeature" SET "isEnabled" = true WHERE feature = 'ALLOW_REGULAR_LOGIN';
-```
-
-## Complete Original Scripts
-
-If you prefer to use the full interactive scripts instead of individual commands:
-
-### Unix/Linux/macOS Script
-
-```bash
-# Make the script executable
-chmod +x full-snailycad-recovery.sh
-
-# Run the script
-./full-snailycad-recovery.sh
-```
-
-### Windows Script
-
-```cmd
-REM Run the script
-recover.bat
-```
-
-## Additional Commands Reference
-
-### Find Users by Username Pattern
-
-```sql
-SELECT id, username, "discordId" 
-FROM public."User" 
-WHERE username LIKE '%PATTERN%';
-```
-
-### Count Total Users
-
-```sql
-SELECT COUNT(*) as total_users 
-FROM public."User" 
-WHERE username IS NOT NULL;
-```
-
-### List All Features and Their Status
-
-```sql
-SELECT feature, "isEnabled",
-  CASE 
-    WHEN "isEnabled" = true THEN 'Enabled' 
-    ELSE 'Disabled' 
-  END as status
-FROM public."CadFeature" 
-ORDER BY feature;
-```
-
-### Backup Important Tables (pg_dump commands)
-
-```bash
-# Backup User table
-pg_dump -U your_username -h localhost -p 5432 -d your_database -t public."User" > user_backup.sql
-
-# Backup CadFeature table
-pg_dump -U your_username -h localhost -p 5432 -d your_database -t public."CadFeature" > features_backup.sql
-
-# Backup CAD table
-pg_dump -U your_username -h localhost -p 5432 -d your_database -t public."cad" > cad_backup.sql
-```
-
-### Test Database Connection
-
-```sql
-SELECT current_database(), current_user, version();
-```
+- **Always backup your database** before making changes
+- **Test operations** on a single user before bulk changes
+- **Document changes** made for future reference
+- **Keep credentials secure** - never share database passwords
+- **Monitor performance** after maintenance operations
 
 ---
 
+## 📞 Support
 
+This tool directly modifies your SnailyCAD database. For additional support:
 
+- **SnailyCAD Documentation:** Official project documentation
+- **Community Forums:** User community support
+- **Database Issues:** Consult PostgreSQL documentation
+- **Backup & Recovery:** Implement regular backup procedures
 
+---
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+*This tool is designed for experienced server administrators. Always maintain current database backups and test changes in a development environment when possible.*
